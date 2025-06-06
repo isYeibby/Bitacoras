@@ -1,0 +1,43 @@
+Ejemplos
+
+Los métodos mágicos en PHP son funciones especiales que permiten controlar el comportamiento interno de un objeto, especialmente en situaciones dinámicas.
+
+    Usaría __construct y __destruct para inicializar o liberar recursos automáticamente.
+
+    Utilizaría __get y __set para gestionar propiedades que no están declaradas explícitamente, como en modelos de datos flexibles.
+
+    __call lo aplicaría para manejar llamadas a métodos no definidos, útil en clases con funciones dinámicas (como una calculadora, un proxy o APIs).
+
+
+Actividad 2
+
+    Este código muestra cómo los métodos mágicos __set y __get pueden usarse para validar y controlar el acceso a propiedades privadas de una clase.
+Utilidad:
+
+    __set permite interceptar la asignación de valores y aplicar reglas de validación, como asegurar que el nombre tenga mínimo 3 caracteres o que el correo contenga '@'.
+
+    __get da acceso seguro a propiedades privadas, comprobando primero si existen.
+
+¿Cuándo lo usaría?
+
+    Cuando necesito validar o filtrar datos antes de asignarlos (como en formularios).
+
+    Cuando quiero mantener mis atributos privados pero permitir acceso controlado y personalizado desde fuera de la clase.
+
+Actividad 3
+
+Este ejemplo muestra cómo el método mágico __call permite manejar llamadas a métodos que no existen dentro de la clase.
+
+Utilidad:
+
+    Con __call, puedes definir un comportamiento dinámico para métodos que no están explícitamente escritos, como responder a saludar() aunque no esté declarado.
+
+    Es útil para API dinámicas, wrappers, o clases donde los métodos dependen de ciertas condiciones.
+
+¿Cuándo lo usaría?
+
+    Cuando quiero manejar varios métodos similares sin definir cada uno por separado.
+
+    Para atrapar errores por métodos inexistentes y dar mensajes personalizados.
+
+    Para crear interfaces flexibles, como asistentes virtuales o funciones extensibles.
