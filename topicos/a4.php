@@ -1,6 +1,4 @@
 <?php
-// Objetivo: Implementar un sistema de roles con constantes reutilizables en múltiples clases.
-
 // Definición del trait con constantes
 trait RolUsuario {
     const ADMIN = 'Administrador';
@@ -10,6 +8,7 @@ trait RolUsuario {
 
 // Clase Usuario que utiliza el trait RolUsuario
 class Usuario {
+    use RolUsuario;
 
     private string $nombre;
     private string $rol;
@@ -20,7 +19,7 @@ class Usuario {
     }
 
     public function mostrarInfo() {
-        echo "Nombre: {$this->nombre}, Rol: {$this->rol} ";
+        echo "Nombre: {$this->nombre}, Rol: {$this->rol}\n";
     }
 }
 
