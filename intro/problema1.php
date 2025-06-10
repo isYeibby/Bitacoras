@@ -22,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'edad' => $edad,
             'calificacion' => $calificacion
         ];
-        $mensaje = "✅ Estudiante registrado correctamente.";
+        $mensaje = "Estudiante registrado correctamente.";
     } else {
-        $mensaje = "❌ Datos inválidos. Intente de nuevo.";
+        $mensaje = "Datos inválidos. Intente de nuevo.";
     }
 }
 ?>

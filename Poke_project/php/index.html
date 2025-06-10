@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Pokédex Simple</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 30px auto;
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #e53935;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .pokemon-info, .pokemon-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        .pokemon-item {
+            border-bottom: 1px solid #ccc;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Buscador y Guardado de Pokémon</h1>
+
+    <input type="text" id="pokemon-name-input" placeholder="Ejemplo: pikachu" />
+    <button id="buscar-btn">Buscar</button>
+
+    <div class="pokemon-info" id="pokemon-info"></div>
+
+    <button id="guardar-btn" style="display:none; margin-top:10px;">Guardar Pokémon</button>
+
+    <div class="pokemon-list" id="pokemon-list">
+        <h2>Pokémon guardados:</h2>
+        <div id="lista"></div>
+    </div>
+
+    <div id="mensaje"></div>
+
+<script>
+const buscarBtn = document.getElementById('buscar-btn');
+const guardarBtn = document.getElementById('guardar-btn');
+const pokemonInfoDiv = document.getElementById('pokemon-info');
+const mensajeDiv = document.getElementById('mensaje');
+const listaDiv = document.getElementById('lista');
+
+let pokemonActual = null;
+
+function limpiarMensaje() {
+    mensajeDiv.innerHTML = '';
+}
+
+function mostrarMensaje(texto, tipo = 'success') {
+    mensajeDiv.innerHTML = `<p class="${tipo}">${texto}</p>`;
+}
+
+buscarBtn.addEventListener('click', () => {
+    limpiarMensaje();
+    const nombre = document.getElementById('pokemon-name-input').value.trim().toLowerCase();
+    if (!nombre) {
+        mostrarMensaje('Por favor ingresa un nombre de Pokémon', 'error');
+        return;
+    }
+    pokemonInfoDiv.innerHTML = 'Buscando...';
+    guardarBtn.style.display = 'none';
+    fetch(`https://pokeapi.co/api/v2/pokemon/${nombre}`)
+        .then(res => {
+            if (!res.ok) throw new Error('Pokémon no encontrado');
+            return res.json();
+        })
+        .then(data => {
+            // Mostrar solo nombre y tipos
+            const tipos = data.types.map(t => t.type.name).join(', ');
+            pokemonInfoDiv.innerHTML = `<p><strong>Nombre:</strong> ${data.name}</p><p><strong>Tipo:</strong> ${tipos}</p>`;
+            pokemonActual = { nombre: data.name, tipo: tipos };
+            guardarBtn.style.display = 'inline-block';
+        })
+        .catch(err => {
+            pokemonInfoDiv.innerHTML = '';
+            mostrarMensaje(err.message, 'error');
+            pokemonActual = null;
+        });
+});
+
+guardarBtn.addEventListener('click', () => {
+    if (!pokemonActual) return;
+    limpiarMensaje();
+    const formData = new FormData();
+    formData.append('nombre', pokemonActual.nombre);
+    formData.append('tipo', pokemonActual.tipo);
+
+    fetch('capturar.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            mostrarMensaje(data.error, 'error');
+        } else if (data.success) {
+            mostrarMensaje(data.success, 'success');
+            cargarPokemones();
+            pokemonInfoDiv.innerHTML = '';
+            guardarBtn.style.display = 'none';
+            document.getElementById('pokemon-name-input').value = '';
+            pokemonActual = null;
+        }
+    })
+    .catch(() => mostrarMensaje('Error en la solicitud', 'error'));
+});
+
+function cargarPokemones() {
+    fetch('mostrar_pokemones.php')
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                listaDiv.innerHTML = `<p class="error">${data.error}</p>`;
+                return;
+            }
+            if (data.length === 0) {
+                listaDiv.innerHTML = '<p>No hay Pokémon guardados.</p>';
+                return;
+            }
+            let html = '';
+            data.forEach(p => {
+                html += `<div class="pokemon-item"><strong>${p.nombre}</strong> - Tipo: ${p.tipo}</div>`;
+            });
+            listaDiv.innerHTML = html;
+        })
+        .catch(() => {
+            listaDiv.innerHTML = '<p class="error">Error al cargar los Pokémon</p>';
+        });
+}
+
+// Cargar la lista al iniciar
+cargarPokemones();
+
+</script>
+
+</body>
+</html>
